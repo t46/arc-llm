@@ -47,7 +47,7 @@ def generate_nl_and_io_prompt(task, few_shot_id, target_id):
         + "\n\nThe input grid is:\n"
         + str(input_grid)
         + "\n\nWhat is the output grid?"
-        + "\n\nOutput gird surrounded by <output_grid> and <output_grid>"
+        + "\n\nOutput grid should be surrounded by <output_grid> and <output_grid>"
     )
     return prompt
 
@@ -63,45 +63,47 @@ def generate_test_prediction_prompt(task):
         + "\n\nThe input grid is:\n"
         + str(input_grid)
         + "\n\nWhat is the output grid?"
-        + "\n\nOutput gird surrounded by <output_grid> and <output_grid>"
+        + "\n\nOutput grid should be surrounded by <output_grid> and <output_grid>"
     )
     return prompt
+
 
 def calc_diff(pred_grid, gt_grid):
     diff = gt_grid != pred_grid
     diff = diff.astype(int)
     return diff
 
+
 def generate_review_prompt(review_type, pred_grid, gt_grid):
 
     if review_type == "type1":
         prompt = f"""Your output was incorrect.
-
-    Please clearly identify the differences between the correct answer and your output.
-    Specifically, highlight which part of the given task description was not accurately executed, resulting in this discrepancy.
-    Then, provide the correct answer based on the correct interpretation of the task.
-    Output gird should be surrounded by <output_grid> and <output_grid>.
+Please clearly identify the differences between the correct answer and your output.
+Specifically, highlight which part of the given task description was not accurately executed, resulting in this discrepancy.
+Then, provide the correct answer based on the correct interpretation of the task.
+Output grid should be surrounded by <output_grid> and <output_grid>.
 """
 
     elif review_type == "type2":
         if pred_grid is None:
             prompt = f"""Your output was incorrect.
-        First of all, the grid shape is not correct.
-        Please clearly identify the differences between the correct answer and your output.
-        Specifically, highlight which part of the given task description was not accurately executed, resulting in this discrepancy.
-        Then, provide the correct answer based on the correct interpretation of the task.
-        Output gird should be surrounded by <output_grid> and <output_grid>.
+First of all, the grid shape is not correct.
+Please clearly identify the differences between the correct answer and your output.
+Specifically, highlight which part of the given task description was not accurately executed, resulting in this discrepancy.
+Then, provide the correct answer based on the correct interpretation of the task.
+Output grid should be surrounded by <output_grid> and <output_grid>.
     """
         else:
             diff = str(calc_diff(pred_grid, gt_grid))
             prompt = f"""Your output was incorrect.
-            The difference is 
-            {diff}.
-            
-        The incorrect areas have been identified and should be analysed again and corrected appropriately based on this.
-        Please clearly identify the differences between the correct answer and your output.
-        Then, provide the correct answer based on the correct interpretation of the task.
-        Output gird should be surrounded by <output_grid> and <output_grid>.
+The difference is 
+{diff},
+where 1 refers to the incorrect areas and 0 correct.
+    
+The incorrect areas have been identified and should be analysed again and corrected appropriately based on this.
+Please clearly identify the differences between the correct answer and your output.
+Then, provide the correct answer based on the correct interpretation of the task.
+Output grid should be surrounded by <output_grid> and <output_grid>.
     """
 
     return prompt
