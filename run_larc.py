@@ -12,7 +12,7 @@ from src.evaluation import eval_score
 from src.utils import extract_output
 
 # YAML からイテレーション数などの実験条件の読み込み
-with open("config.yaml") as yaml_file:
+with open("./config.yaml") as yaml_file:
     config = yaml.load(yaml_file, Loader=yaml.FullLoader)
 
 # get API key
@@ -32,7 +32,7 @@ if __name__ == "__main__":
 
     with open("data/larc_gpt4.json") as json_file:
         larc_gpt4 = json.load(json_file)
-    selected_tasks = larc_gpt4[: config["num_tasks"]]
+    selected_tasks = larc_gpt4[:config["num_tasks"]]
 
     for task in selected_tasks:
         conv = Coversation(save_dir=save_dir)
