@@ -33,7 +33,7 @@ def get_llm_response(conversation):
     return response.choices[0].message.content
 
 if __name__ == "__main__":
-    save_dir = Path("./result")
+    save_dir = Path("./result/raw")
 
     with open("data/larc_gpt4.json") as json_file:
         larc_gpt4 = json.load(json_file)
