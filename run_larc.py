@@ -9,9 +9,10 @@ import yaml
 from src.prompts import (
     generate_nl_and_io_prompt,
     generate_review_prompt,
-    generate_test_prediction_prompt,
+    generate_test_prediction_prompt
 )
-from src.conversation import Coversation
+
+from src.conversation import Conversation
 from src.evaluation import eval_score
 from src.utils import extract_output
 
@@ -24,14 +25,12 @@ api_key_path = Path("../../openai_po991_arc.key")
 os.environ["OPENAI_API_KEY"] = api_key_path.read_text().strip()
 client = OpenAI()
 
-
 def get_llm_response(conversation):
     response = client.chat.completions.create(
         model=config["model"],
         messages=conversation,
     )
     return response.choices[0].message.content
-
 
 if __name__ == "__main__":
     save_dir = Path("./result")
@@ -41,7 +40,7 @@ if __name__ == "__main__":
     selected_tasks = larc_gpt4[: config["num_tasks"]]
 
     for task in selected_tasks:
-        conv = Coversation(save_dir=save_dir)
+        conv = Conversation(save_dir=save_dir)
         few_shot_id = 0
         target_id = few_shot_id + 1
 
