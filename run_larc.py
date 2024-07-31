@@ -31,7 +31,7 @@ def eval_score(pred_grid, gt_grid, show=True):
 
 def get_llm_response(conversation):
     response = client.chat.completions.create(
-        model="gpt-4o",
+        model="gpt-4o-mini-2024-07-18",
         messages=conversation,
     )
     return response.choices[0].message.content
