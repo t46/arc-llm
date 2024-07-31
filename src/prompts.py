@@ -14,7 +14,7 @@ the numbers represent different colors:
 9 = brown
 
 """
-def nl_and_io_prompt(task, few_shot_id, target_id):
+def generate_nl_and_io_prompt(task, few_shot_id, target_id):
     
     instruction = "here is the instruction of how to transform the grid: \n"
     instruction += task['description']['description_input'] + task['description']['description_output_grid_size'] + task['description']['description_output']
@@ -29,7 +29,16 @@ def nl_and_io_prompt(task, few_shot_id, target_id):
     prompt = preamble + instruction + input_output_example + "\n\nThe input grid is:\n" + str(input_grid) + "\n\nWhat is the output grid?" + "\n\nOutput gird surrounded by <output_grid> and <output_grid>"
     return prompt 
 
-def review(grid):
+# タスクを入力したら、テストに対して推論をする関数
+def generate_test_prediction_prompt(task):
+
+    input_grid = task['problem']['test'][0]['input']
+
+    # NOTE: preamble いらないかも
+    prompt = preamble + "\n\nThe input grid is:\n" + str(input_grid) + "\n\nWhat is the output grid?" + "\n\nOutput gird surrounded by <output_grid> and <output_grid>"
+    return prompt 
+
+def generate_review_prompt():
     prompt = f'''Your output was incorrect.
 
 Please clearly identify the differences between the correct answer and your output.
