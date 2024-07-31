@@ -15,6 +15,52 @@ the numbers represent different colors:
 
 """
 
+def generate_dsl():
+    preamble = '''This is the DSL for the ARC task. You can use this DSL to write a program that transforms the input grid into the output grid. The DSL is written in Python. You can use the following functions to write your program:'''
+    postamble = '''
+Above is the DSL for the ARC task. You can use this DSL to write a program that transforms the input grid into the output grid. The DSL is written in Python.'''
+
+    filepath = './arc-dsl/dsl.py'
+    with open(filepath, 'r') as f:
+        code = f.read()
+    return preamble + code + postamble
+
+
+def generate_dsl_prompt(task, few_shot_id, target_id):
+
+    instruction = "here is the instruction of how to transform the grid: \n"
+    instruction += (
+        task["description"]["description_input"]
+        + task["description"]["description_output_grid_size"]
+        + task["description"]["description_output"]
+    )
+
+    train_input = task["problem"]["train"][few_shot_id]["input"]
+    train_output = task["problem"]["train"][few_shot_id]["output"]
+    input_output_example = (
+        "\n\nhere is an example of an input grid and its corresponding output grid:\n"
+    )
+    input_output_example += (
+        "example input grid:\n"
+        + str(train_input)
+        + "\nexample output grid:\n"
+        + str(train_output)
+        + "\n\n"
+    )
+
+    input_grid = task["problem"]["train"][target_id]["input"]
+
+    prompt = (
+        preamble
+        + generate_dsl()
+        + instruction
+        + input_output_example
+        + "\n\nThe input grid is:\n"
+        + str(input_grid)
+        + "\n\nWhat are the dsl functions to generate output grid? Please answer the set of functions up to 20 functions."
+    )
+    return prompt
+
 
 def generate_nl_and_io_prompt(task, few_shot_id, target_id):
 
