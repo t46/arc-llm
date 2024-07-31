@@ -48,7 +48,11 @@ if __name__ == '__main__':
     for task in larc_gpt4[:max_num_tasks]:
 
         conversation = [{"role": "system", "content": "You are an autonomous task solver."}]
-        prompt = nl_and_io_prompt(task)
+
+        # TODO: few_shot_id と target_id は len(task['problem']['train']) に対する for 文を回して順次指定する 
+        few_shot_id = 0
+        target_id = few_shot_id + 1
+        prompt = nl_and_io_prompt(task, few_shot_id, target_id)
         conversation.append({'role': 'user', 'content': prompt})
 
         # print(prompt)
