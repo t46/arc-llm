@@ -8,6 +8,7 @@ from openai import OpenAI
 from src.prompts import generate_nl_and_io_prompt, generate_review_prompt, generate_test_prediction_prompt
 from src.conversation import Coversation
 from src.evaluation import eval_score
+from src.utils import extract_output
 
 # get API key
 api_key_path = Path("../../openai_po991_arc.key")
@@ -46,10 +47,13 @@ if __name__ == "__main__":
             answer = get_llm_response(conv.history)
             conv.add_assistant(answer)
             conv.print()
-
-            pred_grid = answer.split("<output_grid>")[1].split("</output_grid>")[0]
+            # Error Handling
+            try:
+                pred_grid = extract_output(answer, "output_grid")
+            except:
+                print("Error: output_grid tag is not found")
+                break
             gt_grid = task["problem"]["train"][target_id]["output"]
-
             score = eval_score(pred_grid, gt_grid)
             scores.append(score)
             if score == 1:
@@ -62,7 +66,12 @@ if __name__ == "__main__":
         conv.print()
         answer = get_llm_response(conv.history)
         conv.add_assistant(answer)
-        pred_grid = answer.split("<output_grid>")[1].split("</output_grid>")[0]
+        # Error Handling
+        try:
+            pred_grid = extract_output(answer, "output_grid")
+        except:
+            print("Error: output_grid tag is not found")
+            break
         gt_grid = task["problem"]["test"][0]["output"]
         score = eval_score(pred_grid, gt_grid)
         print(f"Test score: {score}")
