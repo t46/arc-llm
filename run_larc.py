@@ -4,11 +4,16 @@ import json
 from pathlib import Path
 import numpy as np
 from openai import OpenAI
+import yaml
 
 from src.prompts import generate_nl_and_io_prompt, generate_review_prompt, generate_test_prediction_prompt
 from src.conversation import Coversation
 from src.evaluation import eval_score
 from src.utils import extract_output
+
+# YAML からイテレーション数などの実験条件の読み込み
+with open("config.yaml") as yaml_file:
+    config = yaml.load(yaml_file, Loader=yaml.FullLoader)
 
 # get API key
 api_key_path = Path("../../openai_po991_arc.key")
@@ -17,7 +22,7 @@ client = OpenAI()
 
 def get_llm_response(conversation):
     response = client.chat.completions.create(
-        model="gpt-4o-mini-2024-07-18",
+        model=config["model"],
         messages=conversation,
     )
     return response.choices[0].message.content
@@ -27,7 +32,7 @@ if __name__ == "__main__":
 
     with open("data/larc_gpt4.json") as json_file:
         larc_gpt4 = json.load(json_file)
-    selected_tasks = larc_gpt4[:1]
+    selected_tasks = larc_gpt4[: config["num_tasks"]]
 
     for task in selected_tasks:
         conv = Coversation(save_dir=save_dir)
@@ -55,7 +60,7 @@ if __name__ == "__main__":
             print("Break the round loop")
             break
 
-        for round in range(1, 3):
+        for round in range(1, config["max_round"] + 1):
             print(f"Round {round}")
             conv.add_user(generate_review_prompt())
             conv.print()
