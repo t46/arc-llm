@@ -3,7 +3,7 @@ import os
 import json
 from pathlib import Path
 import numpy as np
-from src.prompts import nl_and_io_prompt, review
+from src.prompts import generate_nl_and_io_prompt, generate_review_prompt, generate_test_prediction_prompt
 
 import numpy as np
 from openai import OpenAI
@@ -90,7 +90,7 @@ if __name__ == "__main__":
         conv = Coversation(save_dir=save_dir)
         few_shot_id = 0
         target_id = few_shot_id + 1
-        prompt = nl_and_io_prompt(task, few_shot_id, target_id)
+        prompt = generate_nl_and_io_prompt(task, few_shot_id, target_id)
         conv.add_user(prompt)
         conv.print()
         conv.add_assistant(get_llm_response(conv.history))
@@ -99,14 +99,14 @@ if __name__ == "__main__":
         scores = []
         for round in range(2):
             print(f"Round {round}")
-            conv.add_user(review(task["problem"]["train"][1]["output"]))
+            conv.add_user(generate_review_prompt(task["problem"]["train"][target_id]["output"]))
             conv.print()
             answer = get_llm_response(conv.history)
             conv.add_assistant(answer)
             conv.print()
 
             pred_grid = answer.split("<output_grid>")[1].split("</output_grid>")[0]
-            gt_grid = task["problem"]["train"][1]["output"]
+            gt_grid = task["problem"]["train"][target_id]["output"]
 
             score = eval_score(pred_grid, gt_grid)
             scores.append(score)
@@ -114,5 +114,5 @@ if __name__ == "__main__":
                 print("Get the correct answer!")
                 print("Break the round loop")
                 break
-        
+
         conv.save_conversation()
