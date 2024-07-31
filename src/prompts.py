@@ -94,7 +94,8 @@ def generate_review_prompt(review_type, pred_grid, gt_grid):
     """
         else:
             diff = str(calc_diff(pred_grid, gt_grid))
-            prompt = f"""Your output was incorrect. The difference is {diff}.
+            prompt = f"""Your output was incorrect.
+            The difference is {diff}.
             
         The incorrect areas have been identified and should be analysed again and corrected appropriately based on this.
         Please clearly identify the differences between the correct answer and your output.
