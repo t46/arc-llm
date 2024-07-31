@@ -34,6 +34,7 @@ def generate_test_prediction_prompt(task):
 
     input_grid = task['problem']['test'][0]['input']
 
+    # NOTE: preamble いらないかも
     prompt = preamble + "\n\nThe input grid is:\n" + str(input_grid) + "\n\nWhat is the output grid?" + "\n\nOutput gird surrounded by <output_grid> and <output_grid>"
     return prompt 
 

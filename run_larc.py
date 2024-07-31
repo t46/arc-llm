@@ -99,7 +99,7 @@ if __name__ == "__main__":
         scores = []
         for round in range(2):
             print(f"Round {round}")
-            conv.add_user(generate_review_prompt(task["problem"]["train"][target_id]["output"]))
+            conv.add_user(generate_review_prompt())
             conv.print()
             answer = get_llm_response(conv.history)
             conv.add_assistant(answer)
@@ -114,5 +114,16 @@ if __name__ == "__main__":
                 print("Get the correct answer!")
                 print("Break the round loop")
                 break
+    
+        # テストに対する推論
+        conv.add_user(generate_test_prediction_prompt(task))
+        conv.print()
+        answer = get_llm_response(conv.history)
+        conv.add_assistant(answer)
+        pred_grid = answer.split("<output_grid>")[1].split("</output_grid>")[0]
+        gt_grid = task["problem"]["test"][0]["output"]
+        score = eval_score(pred_grid, gt_grid)
+        print(f"Test score: {score}")
+        conv.print()
 
         conv.save_conversation()
