@@ -16,6 +16,9 @@ class Coversation:
         self.conversation.append({"role": "assistant", "content": txt})
         self.roles.append("assistant")
 
+    def add_score(self, score):  #TODO: 現状は評価をした直後に呼ばないと意味をなさないので、後で改善する
+        self.conversation[-1]["score"] = score
+
     @property
     def history(self):
         return self.conversation

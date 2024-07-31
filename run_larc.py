@@ -33,14 +33,29 @@ if __name__ == "__main__":
         conv = Coversation(save_dir=save_dir)
         few_shot_id = 0
         target_id = few_shot_id + 1
+
+        print(f"Round 0")
         prompt = generate_nl_and_io_prompt(task, few_shot_id, target_id)
         conv.add_user(prompt)
         conv.print()
-        conv.add_assistant(get_llm_response(conv.history))
+        answer = get_llm_response(conv.history)
+        conv.add_assistant(answer)
         conv.print()
+        # Error Handling
+        try:
+            pred_grid = extract_output(answer, "output_grid")
+        except:
+            print("Error: output_grid tag is not found")
+            break
+        gt_grid = task["problem"]["train"][target_id]["output"]
+        score = eval_score(pred_grid, gt_grid)
+        conv.add_score(score)
+        if score == 1:
+            print("Get the correct answer!")
+            print("Break the round loop")
+            break
 
-        scores = []
-        for round in range(2):
+        for round in range(1, 3):
             print(f"Round {round}")
             conv.add_user(generate_review_prompt())
             conv.print()
@@ -55,7 +70,7 @@ if __name__ == "__main__":
                 break
             gt_grid = task["problem"]["train"][target_id]["output"]
             score = eval_score(pred_grid, gt_grid)
-            scores.append(score)
+            conv.add_score(score)
             if score == 1:
                 print("Get the correct answer!")
                 print("Break the round loop")
