@@ -3,6 +3,7 @@ _*.ipynb
 # data
 # data/
 # model/
+result/
 misc/
 logs/
 log/
