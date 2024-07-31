@@ -9,7 +9,7 @@ import yaml
 from src.prompts import (
     generate_nl_and_io_prompt,
     generate_review_prompt,
-    generate_test_prediction_prompt
+    generate_test_prediction_prompt,
 )
 
 from src.conversation import Conversation
@@ -25,6 +25,7 @@ api_key_path = Path("../../openai_po991_arc.key")
 os.environ["OPENAI_API_KEY"] = api_key_path.read_text().strip()
 client = OpenAI()
 
+
 def get_llm_response(conversation):
     response = client.chat.completions.create(
         model=config["model"],
@@ -32,8 +33,9 @@ def get_llm_response(conversation):
     )
     return response.choices[0].message.content
 
+
 if __name__ == "__main__":
-    save_dir = Path("./result/raw")
+    save_dir = Path("./result/raw/exp2")
 
     with open("data/larc_gpt4.json") as json_file:
         larc_gpt4 = json.load(json_file)
@@ -51,7 +53,9 @@ if __name__ == "__main__":
             if round == 0:
                 prompt = generate_nl_and_io_prompt(task, few_shot_id, target_id)
             else:
-                prompt = generate_review_prompt()
+                prompt = generate_review_prompt(
+                    config["review_type"], pred_grid, gt_grid
+                )
             conv.add_user(prompt)
             conv.print()
             answer = get_llm_response(conv.history)
