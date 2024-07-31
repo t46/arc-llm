@@ -10,6 +10,7 @@ from src.prompts import (
     generate_nl_and_io_prompt,
     generate_review_prompt,
     generate_test_prediction_prompt,
+    generate_dsl_prompt
 )
 
 from src.conversation import Conversation
@@ -52,12 +53,13 @@ if __name__ == "__main__":
             print(f"Round {round}")
             if round == 0:
                 prompt = generate_nl_and_io_prompt(task, few_shot_id, target_id)
+                # prompt = generate_dsl_prompt(task, few_shot_id, target_id)
             else:
                 prompt = generate_review_prompt(
                     config["review_type"], pred_grid, gt_grid
                 )
             conv.add_user(prompt)
-            conv.print()
+            # conv.print()
             answer = get_llm_response(conv.history)
             conv.add_assistant(answer)
             conv.print()
