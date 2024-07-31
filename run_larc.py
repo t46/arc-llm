@@ -62,14 +62,14 @@ if __name__ == '__main__':
 
         for round in range(1):
             print(f'Round {round}')
-            prompt = review(task['problem']['train'][1]['output'])
+            prompt = review(task['problem']['train'][target_id]['output'])
             conversation.append({'role': 'user', 'content': prompt})
 
             answer = get_llm_response(conversation)
             conversation.append({'role': 'assistant', 'content': answer})
 
             pred_grid = answer.split('<output_grid>')[1].split('</output_grid>')[0]
-            gt_grid = task['problem']['train'][1]['output']
+            gt_grid = task['problem']['train'][target_id]['output']
 
             score = eval_score(pred_grid, gt_grid)
             print(f'score: {score}')
