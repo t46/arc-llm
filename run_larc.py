@@ -57,9 +57,7 @@ the numbers represent different colors:
 
 """
 
-
 def nl_and_io_prompt(task):
-
     instruction = "here is the instruction of how to transform the grid: \n"
     instruction += (
         task["description"]["description_input"]
@@ -127,7 +125,7 @@ if __name__ == "__main__":
         # print(answer)
         conversation.append({"role": "assistant", "content": answer})
 
-        for round in range(1):
+        for round in range(3):
             print(f"Round {round}")
             prompt = review(task["problem"]["train"][1]["output"])
             conversation.append({"role": "user", "content": prompt})
@@ -139,7 +137,7 @@ if __name__ == "__main__":
             gt_grid = task["problem"]["train"][1]["output"]
 
             score = eval_score(pred_grid, gt_grid)
-            print(f"score: {score}")
+            print("\033[93m" + f"score: {score}" + "\033[0m")
 
             if score == 1:
                 break
@@ -150,6 +148,3 @@ if __name__ == "__main__":
             print("-" * 10)
             print(f"[{conv['role']}]")
             print(conv["content"])
-
-        with open("data/larc_gpt4_newer.json", "w") as outfile:
-            json.dump(larc_gpt4, outfile)
