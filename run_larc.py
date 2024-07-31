@@ -3,31 +3,16 @@ import os
 import json
 from pathlib import Path
 import numpy as np
-from src.prompts import nl_and_io_prompt, review
-
-import numpy as np
 from openai import OpenAI
+
+from src.prompts import nl_and_io_prompt, review
+from src.conversation import Coversation
+from src.evaluation import eval_score
 
 # get API key
 api_key_path = Path("../../openai_po991_arc.key")
 os.environ["OPENAI_API_KEY"] = api_key_path.read_text().strip()
 client = OpenAI()
-
-def eval_score(pred_grid, gt_grid, show=True):
-    pred_grid = np.array(eval(str(pred_grid)))
-    gt_grid = np.array(eval(str(gt_grid)))
-    pred_shape = pred_grid.shape
-    gt_shape = gt_grid.shape
-
-    if pred_shape != gt_shape:
-        score = 0.0
-    else:
-        score = (pred_grid == gt_grid).sum() / (pred_shape[0] * pred_shape[1])
-
-    if show:
-        print("\033[93m" + f"score: {score}" + "\033[0m")
-
-    return score
 
 def get_llm_response(conversation):
     response = client.chat.completions.create(
@@ -35,49 +20,6 @@ def get_llm_response(conversation):
         messages=conversation,
     )
     return response.choices[0].message.content
-
-class Coversation:
-    def __init__(self, save_dir):
-        self.conversation = [
-            {"role": "system", "content": "You are an autonomous task solver."}
-        ]
-        self.roles = ['system']
-        self.save_dir = save_dir
-
-    def add_user(self, txt):
-        self.conversation.append({"role": "user", "content": txt})
-        self.roles.append("user")
-
-    def add_assistant(self, txt):
-        self.conversation.append({"role": "assistant", "content": txt})
-        self.roles.append("assistant")
-
-    @property
-    def history(self):
-        return self.conversation
-    
-    def _print(self, conv):
-        print("=" * 20)
-        print(f"[{conv['role']}]")
-        print(conv['role'])
-        print("=" * 20)
-        print(conv["content"])
-        print('-*' * 40)
-
-    def print(self):
-        conv = self.conversation[-1]
-        self._print(conv)
-
-    def print_history(self):
-        for conv in self.conversation:
-            self._print(conv)
-    
-    def save_conversation(self):
-        files = save_dir.glob("*.json")
-        path = self.save_dir / f'{str(len(list(files))).zfill(3)}.json'
-        path.parent.mkdir(parents=True, exist_ok=True)
-        with open(path, "w") as f:
-            json.dump(self.conversation, f, indent=4)
 
 if __name__ == "__main__":
     save_dir = Path('./result')
