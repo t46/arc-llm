@@ -2,6 +2,8 @@
 import os
 import json
 from pathlib import Path
+import numpy as np
+from src.prompts import nl_and_io_prompt, review
 
 import numpy as np
 from openai import OpenAI
@@ -26,69 +28,6 @@ def eval_score(pred_grid, gt_grid, show=True):
         print("\033[93m" + f"score: {score}" + "\033[0m")
 
     return score
-
-preamble = """
-lets play a game where you are transforming an input grid of numbers into an output grid of numbers
-
-the numbers represent different colors:
-0 = black
-1 = blue
-2 = red
-3 = green
-4 = yellow
-5 = gray
-6 = magenta
-7 = orange
-8 = cyan
-9 = brown
-
-"""
-
-def nl_and_io_prompt(task):
-    instruction = "here is the instruction of how to transform the grid: \n"
-    instruction += (
-        task["description"]["description_input"]
-        + task["description"]["description_output_grid_size"]
-        + task["description"]["description_output"]
-    )
-
-    train_input = task["problem"]["train"][0]["input"]
-    train_output = task["problem"]["train"][0]["output"]
-    input_output_example = (
-        "\n\nhere is an example of an input grid and its corresponding output grid:\n"
-    )
-    input_output_example += (
-        "example input grid:\n"
-        + str(train_input)
-        + "\nexample output grid:\n"
-        + str(train_output)
-        + "\n\n"
-    )
-
-    input_grid = task["problem"]["train"][1]["input"]
-
-    prompt = (
-        preamble
-        + instruction
-        + input_output_example
-        + "\n\nThe input grid is:\n"
-        + str(input_grid)
-        + "\n\nWhat is the output grid?"
-        + "\n\nOutput gird surrounded by <output_grid> and <output_grid>"
-    )
-    return prompt
-
-
-def review(grid):
-    prompt = f"""Your output was incorrect.
-
-Please clearly identify the differences between the correct answer and your output.
-Specifically, highlight which part of the given task description was not accurately executed, resulting in this discrepancy.
-Then, provide the correct answer based on the correct interpretation of the task.
-Output gird surrounded by <output_grid> and <output_grid>
-"""
-    return prompt
-
 
 def get_llm_response(conversation):
     response = client.chat.completions.create(
@@ -149,7 +88,10 @@ if __name__ == "__main__":
 
     for task in selected_tasks:
         conv = Coversation(save_dir=save_dir)
-        conv.add_user(nl_and_io_prompt(task))
+        few_shot_id = 0
+        target_id = few_shot_id + 1
+        prompt = nl_and_io_prompt(task, few_shot_id, target_id)
+        conv.add_user(prompt)
         conv.print()
         conv.add_assistant(get_llm_response(conv.history))
         conv.print()
